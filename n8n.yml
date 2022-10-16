@@ -1,0 +1,51 @@
+namespace: monk-n8n
+
+n8n:
+  defines: runnable
+  variables:
+    basic_auth_active:
+      env: N8N_BASIC_AUTH_ACTIVE
+      type: string
+      value: <- `${monk_basic_auth_active}`
+    basic_auth_user:
+      env: N8N_BASIC_AUTH_USER
+      type: string
+      value: <- `${monk_basic_auth_user}`
+    basic_auth_password:
+      env: N8N_BASIC_AUTH_PASSWORD
+      type: string
+      value: <- `${monk_basic_auth_password}`
+    n8n_hostname:
+      env: N8N_HOST
+      type: string
+      value: <- `${monk_n8n_hostname}`
+    port:
+      env: N8N_PORT
+      type: string
+      value: <- `${monk_n8n_port}`
+    http_protocol:
+      env: N8N_PROTOCOL
+      type: string
+      value: <- `${monk_n8n_http_protocol}`
+    environment_type:
+      env: NODE_ENV
+      type: string
+      value: <- `${monk_n8n_environment_type}`
+    n8n_webhook_url:
+      env: WEBHOOK_URL
+      type: string
+      value: <- `${monk_n8n_webhook_url}`
+    timezone:
+      env: GENERIC_TIMEZONE
+      type: string
+      value: <- `${monk_n8n_timezone}`
+    volume_local:
+      type: string
+      value: <- `${monk-volume-path}/n8n`
+  containers:
+    monk-n8n:
+      image: 'n8nio/n8n'
+      ports:
+        - <- `0.0.0.0:${port}:${port}`
+      paths:
+        - <- `${volume_local}:/home/node/.n8n`
