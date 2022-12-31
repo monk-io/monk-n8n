@@ -17,7 +17,7 @@ not connected to cluster
 
 ## Clone Repository
 ```bash
-git clone https://github.com/Burakhan/monk-n8n
+git clone https://github.com/monk-io/monk-n8n
 ```
 
 ## Load Template
@@ -86,6 +86,7 @@ The variables are in `stack.yml` file. You can quickly setup by editing the valu
 ## Stop, remove and clean up workloads and templates
 
 ```bash
-monk purge -x -a
+monk purge    monk-n8n
+monk purge -x monk-n8n
 ```
 
