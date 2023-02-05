@@ -1,17 +1,9 @@
-namespace: monk-n8n
+namespace: n8n
 
 stack:
-  metadata:
-    defines: metadata
-    name: n8n.io - a powerful workflow automation tool
-    description: n8n is a free and source-available workflow automation tool - install on prem, download our desktop app or sign up for our cloud service
-    tags: automation, workflow
-    website: https://n8n.io
-    publisher: monk.io
-    icon: n8n.png
   defines: process-group
   runnable-list:
-    - monk-n8n/n8n
+    - n8n/n8n
   variables:
     monk_basic_auth_active:
       type: bool

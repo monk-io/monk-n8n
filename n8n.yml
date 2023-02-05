@@ -1,7 +1,21 @@
-namespace: monk-n8n
+namespace: n8n
 
 n8n:
+  metadata:
+    defines: metadata
+    name: n8n.io - a powerful workflow automation tool
+    description: n8n is a free and source-available workflow automation tool - install on prem, download our desktop app or sign up for our cloud service
+    tags: automation, workflow
+    website: https://n8n.io
+    publisher: monk.io
+    icon: n8n.png
   defines: runnable
+  services:
+    n8n:
+      container: n8n
+      port: <- `${port}`
+      protocol: tcp
+      host-port: <- `${port}` to-i
   variables:
     basic_auth_active:
       env: N8N_BASIC_AUTH_ACTIVE
@@ -43,7 +57,7 @@ n8n:
       type: string
       value: <- `${monk-volume-path}/n8n`
   containers:
-    monk-n8n:
+    n8n:
       image: 'n8nio/n8n'
       ports:
         - <- `0.0.0.0:${port}:${port}`
