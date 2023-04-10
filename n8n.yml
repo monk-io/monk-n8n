@@ -1,65 +1,71 @@
+---
 namespace: n8n
 
-n8n:
+base:
+  defines: runnable
   metadata:
-    defines: metadata
     name: n8n.io - a powerful workflow automation tool
     description: n8n is a free and source-available workflow automation tool - install on prem, download our desktop app or sign up for our cloud service
-    tags: automation, workflow
+    tags: Workflow automation, Integration, API, Node.js, No-code, Productivity, Data automation, Cloud automation, Business automation, Webhooks, Open-source, Workflow management, Data synchronization, Event-driven automation, Task automation
     website: https://n8n.io
     publisher: monk.io
-    icon: n8n.png
+    icon: https://avatars.githubusercontent.com/u/45487711?s=200&v=4
+    version: 1.0
+    private: true
+  containers:
+    n8n:
+      image: n8nio/n8n
+      image-tag: latest
+
+n8n:
   defines: runnable
+  inherits: n8n/base
+  metatada:
+    private: false
+  variables:
+    basic_auth_active:
+      env: N8N_BASIC_AUTH_ACTIVE
+      type: string
+      value: true
+    basic_auth_user:
+      env: N8N_BASIC_AUTH_USER
+      type: string
+      value: monk
+    basic_auth_password:
+      env: N8N_BASIC_AUTH_PASSWORD
+      type: string
+      value: monk
+    n8n_hostname:
+      env: N8N_HOST
+      type: string
+      value: n8n.monk.io
+    port:
+      env: N8N_PORT
+      type: string
+      value: 8085
+    http_protocol:
+      env: N8N_PROTOCOL
+      type: string
+      value: http
+    environment_type:
+      env: NODE_ENV
+      type: string
+      value: production
+    n8n_webhook_url:
+      env: WEBHOOK_URL
+      type: string
+      value: n8n.monk.io
+    timezone:
+      env: GENERIC_TIMEZONE
+      type: string
+      value: UTC
+  containers:
+    n8n:
+      paths:
+        - <- `${monk-volume-path}/n8n:/home/node/.n8n`
   services:
     n8n:
       container: n8n
       port: <- `${port}`
       protocol: tcp
-      host-port: <- `${port}` to-i
-  variables:
-    basic_auth_active:
-      env: N8N_BASIC_AUTH_ACTIVE
-      type: string
-      value: <- `${monk_basic_auth_active}`
-    basic_auth_user:
-      env: N8N_BASIC_AUTH_USER
-      type: string
-      value: <- `${monk_basic_auth_user}`
-    basic_auth_password:
-      env: N8N_BASIC_AUTH_PASSWORD
-      type: string
-      value: <- `${monk_basic_auth_password}`
-    n8n_hostname:
-      env: N8N_HOST
-      type: string
-      value: <- `${monk_n8n_hostname}`
-    port:
-      env: N8N_PORT
-      type: string
-      value: <- `${monk_n8n_port}`
-    http_protocol:
-      env: N8N_PROTOCOL
-      type: string
-      value: <- `${monk_n8n_http_protocol}`
-    environment_type:
-      env: NODE_ENV
-      type: string
-      value: <- `${monk_n8n_environment_type}`
-    n8n_webhook_url:
-      env: WEBHOOK_URL
-      type: string
-      value: <- `${monk_n8n_webhook_url}`
-    timezone:
-      env: GENERIC_TIMEZONE
-      type: string
-      value: <- `${monk_n8n_timezone}`
-    volume_local:
-      type: string
-      value: <- `${monk-volume-path}/n8n`
-  containers:
-    n8n:
-      image: 'n8nio/n8n'
-      ports:
-        - <- `0.0.0.0:${port}:${port}`
-      paths:
-        - <- `${volume_local}:/home/node/.n8n`
+      host-port: <- `${port}`

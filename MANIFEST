@@ -1,2 +1,2 @@
 REPO n8n
-LOAD n8n.yml stack.yml
+LOAD n8n.yml
