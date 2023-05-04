@@ -59,10 +59,6 @@ n8n:
       env: GENERIC_TIMEZONE
       type: string
       value: UTC
-  containers:
-    n8n:
-      paths:
-        - <- `${monk-volume-path}/n8n:/home/node/.n8n`
   services:
     n8n:
       container: n8n
