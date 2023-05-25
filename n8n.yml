@@ -6,7 +6,7 @@ base:
   metadata:
     name: n8n.io - a powerful workflow automation tool
     description: n8n is a free and source-available workflow automation tool - install on prem, download our desktop app or sign up for our cloud service
-    tags: Workflow automation, Integration, API, Node.js, No-code, Productivity, Data automation, Cloud automation, Business automation, Webhooks, Open-source, Workflow management, Data synchronization, Event-driven automation, Task automation
+    tags: task automation, business automation, data synchronization, workflow automation, no-code, event-driven automation, workflow management, api, node.js, data automation, open-source, integration, webhooks, productivity
     website: https://n8n.io
     publisher: monk.io
     icon: https://avatars.githubusercontent.com/u/45487711?s=200&v=4
