@@ -1,2 +1,2 @@
 REPO n8n
-LOAD n8n.yml
+LOAD n8n.yml n8n-postgres.yml

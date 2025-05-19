@@ -1,0 +1,128 @@
+---
+namespace: n8n-postgres
+
+db:
+  defines: runnable
+  inherits: postgresql/base
+  metadata:
+    private: false
+  services:
+    postgres:
+      container: postgres
+      protocol: tcp
+      port: 5432
+  containers:
+    postgres:
+      paths:
+        - <- `${monk-volume-path}/n8n-postgresql:/var/lib/postgresql/data`
+  variables:
+    db_user:
+      env: POSTGRES_USER
+      type: string
+      value: <- $n8n_db_user default("monk")
+    db_pass:
+      env: POSTGRES_PASSWORD
+      type: string
+      value: <- $n8n_db_pass default("adminpassword")
+    db_name:
+      env: POSTGRES_DB
+      type: string
+      value: <- $n8n_db_name default("n8n")
+
+n8n:
+  defines: runnable
+  inherits: n8n/base
+  metatada:
+    private: false
+  variables:
+    db_type:
+      env: DB_TYPE
+      type: string
+      value: postgresdb
+    db_name:
+      env: DB_POSTGRESDB_DATABASE
+      type: string
+      value: <- $n8n_db_name default("n8n")
+    db_user:
+      env: DB_POSTGRESDB_USER
+      type: string
+      value: <- $n8n_db_user default("monk")
+    db_pass:
+      env: DB_POSTGRESDB_PASSWORD
+      type: string
+      value: <- $n8n_db_pass default("adminpassword")
+    db_host:
+      env: DB_POSTGRESDB_HOST
+      type: string
+      value: <- connection-hostname("db")
+    db_port:
+      env: DB_POSTGRESDB_PORT
+      type: string
+      value: <- connection-port("db")
+    basic_auth_active:
+      env: N8N_BASIC_AUTH_ACTIVE
+      type: string
+      value: true
+    basic_auth_user:
+      env: N8N_BASIC_AUTH_USER
+      type: string
+      value: monk
+    basic_auth_password:
+      env: N8N_BASIC_AUTH_PASSWORD
+      type: string
+      value: monk
+    n8n_hostname:
+      env: N8N_HOST
+      type: string
+      value: n8n.monk.io
+    port:
+      env: N8N_PORT
+      type: string
+      value: 8085
+    http_protocol:
+      env: N8N_PROTOCOL
+      type: string
+      value: http
+    environment_type:
+      env: NODE_ENV
+      type: string
+      value: production
+    n8n_webhook_url:
+      env: WEBHOOK_URL
+      type: string
+      value: n8n.monk.io
+    timezone:
+      env: GENERIC_TIMEZONE
+      type: string
+      value: UTC
+  services:
+    n8n:
+      container: n8n
+      port: <- `${port}`
+      protocol: tcp
+      host-port: <- `${port}`
+  connections:
+    db:
+      runnable: n8n-postgres/db
+      service: postgres
+  depends:
+    wait-for:
+      runnables:
+        - n8n-postgres/db
+      timeout: 30
+
+stack:
+  defines: process-group
+  variables:
+    n8n_db_name:
+      type: string
+      value: n8n
+    n8n_db_user:
+      type: string
+      value: monk
+    n8n_db_pass:
+      type: string
+      value: pass8word
+  runnable-list:
+    - n8n-postgres/db
+    - n8n-postgres/n8n
