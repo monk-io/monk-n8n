@@ -1,0 +1,202 @@
+---
+title: n8n
+description: Ready-to-run n8n container template for workflow automation and integration platform.
+primary_category: automation
+tags: [n8n, workflow, automation, integration, template, runnable, no-code, zapier-alternative]
+integration_type: template
+hosting_models: [self-hosted]
+website_url: https://n8n.io/
+docs_url: https://docs.n8n.io/
+publisher: monk.io
+---
+
+## Overview
+
+This template provides a production‑ready n8n instance as a Monk runnable. You can:
+
+- Run it directly to get a managed workflow automation platform
+- Inherit it in your own infrastructure to add powerful integration and automation capabilities
+
+n8n is a free and open-source workflow automation tool. It's a self-hostable alternative to Zapier/IFTTT with 200+ integrations, allowing you to connect anything to everything via a visual workflow editor.
+
+## What this template manages
+
+- n8n server with web UI
+- PostgreSQL or SQLite for workflow storage
+- Webhook server
+- Execution engine
+- Web UI on port 5678
+
+## Quick start (run directly)
+
+1) Load templates
+
+```bash
+monk load MANIFEST
+```
+
+2) Run n8n with defaults
+
+```bash
+monk run n8n/n8n
+```
+
+3) Customize credentials (recommended via inheritance)
+
+Running directly uses the defaults defined in this template's `variables`. Secrets added with `monk secrets add` will not affect this runnable unless you inherit it and reference those secrets.
+
+- Preferred: inherit and replace variables with `secret("...")` as shown below.
+- Alternative: fork/clone and edit the `variables` in `n8n/n8n.yml`, then `monk load MANIFEST` and run.
+
+Once started, access n8n UI at `http://localhost:5678` and create your first workflow by clicking "+ New workflow".
+
+## Configuration
+
+Key variables you can customize in this template:
+
+```yaml
+variables:
+  n8n-image-tag: "latest"                      # container image tag
+  n8n-port: "5678"                             # web UI and webhook port
+  n8n-basic-auth-user: "admin"                 # basic auth username (env: N8N_BASIC_AUTH_USER)
+  n8n-basic-auth-password: "..."               # basic auth password (env: N8N_BASIC_AUTH_PASSWORD)
+  n8n-encryption-key: "..."                    # encryption key for credentials (env: N8N_ENCRYPTION_KEY)
+  webhook-url: "http://localhost:5678"         # webhook base URL (env: WEBHOOK_URL)
+  
+  # Database (optional, defaults to SQLite)
+  db-type: "postgresdb"                        # sqlite or postgresdb (env: DB_TYPE)
+  postgres-host: "postgres"                    # PostgreSQL hostname
+  postgres-database: "n8n"                     # PostgreSQL database name
+  postgres-user: "n8n"                         # PostgreSQL username
+  postgres-password: "..."                     # PostgreSQL password
+```
+
+Data is persisted under `${monk-volume-path}/n8n` on the host. When using PostgreSQL, database data is stored under `${monk-volume-path}/postgres`.
+
+## Use by inheritance (recommended for automation)
+
+Inherit the n8n runnable in your application to add workflow automation capabilities. Example:
+
+```yaml
+namespace: myapp
+automation:
+  defines: runnable
+  inherits: n8n/stack
+  variables:
+    n8n-basic-auth-user:
+      value: <- secret("n8n-user")
+    n8n-basic-auth-password:
+      value: <- secret("n8n-password")
+    n8n-encryption-key:
+      value: <- secret("n8n-encryption")
+    webhook-url:
+      value: "https://automation.myapp.com"
+    postgres-password:
+      value: <- secret("postgres-password")
+```
+
+Then set the secrets once and run your app:
+
+```bash
+monk secrets add -g n8n-user="admin"
+monk secrets add -g n8n-password="STRONG_PASSWORD"
+monk secrets add -g n8n-encryption="$(openssl rand -hex 32)"
+monk secrets add -g postgres-password="STRONG_DB_PASSWORD"
+monk run myapp/automation
+```
+
+## Ports and connectivity
+
+- Service: `n8n` on TCP port `5678`
+- Web UI accessible at: `http://<host>:5678`
+- Webhooks received at: `http://<host>:5678/webhook/<path>`
+- From other runnables in the same process group, use `connection-hostname("<connection-name>")` to resolve the n8n host.
+
+## Persistence and configuration
+
+- Data path: `${monk-volume-path}/n8n:/home/node/.n8n`
+- PostgreSQL data path: `${monk-volume-path}/postgres:/var/lib/postgresql/data` (when using PostgreSQL)
+- All workflows, credentials, and execution history are persisted in these volumes.
+
+## Features
+
+- **Visual Workflow Editor**: Drag-and-drop interface
+- **200+ Integrations**: Apps, databases, APIs, and services
+- **Custom Nodes**: Create your own integrations with JavaScript
+- **Webhooks**: Trigger workflows via HTTP
+- **Scheduling**: Run workflows on a schedule
+- **Error Workflows**: Handle errors with separate workflows
+- **Credentials Management**: Secure storage for API keys and passwords
+- **Execution History**: View and retry past executions
+- **Self-Hosted**: Full control over your data
+
+## Available Integrations
+
+Popular nodes include:
+- **Communication**: Slack, Discord, Telegram, Email, SMS
+- **Databases**: MySQL, PostgreSQL, MongoDB, Redis
+- **Cloud**: AWS, GCP, Azure
+- **Storage**: Google Drive, Dropbox, S3
+- **APIs**: HTTP Request, Webhook, GraphQL
+- **Productivity**: Google Sheets, Notion, Airtable
+- **E-commerce**: Shopify, WooCommerce, Stripe
+- **Marketing**: Mailchimp, HubSpot, SendGrid
+
+## Example Workflow
+
+1. **Trigger**: Webhook receives customer form submission
+2. **Action**: Save to Google Sheets
+3. **Action**: Send welcome email via SendGrid
+4. **Action**: Create Slack notification for team
+5. **Action**: Add to CRM (HubSpot/Salesforce)
+
+## Use cases
+
+n8n excels at:
+- Business process automation
+- Data synchronization between apps
+- Webhook processing
+- Scheduled data tasks
+- Customer onboarding workflows
+- Notification systems
+- API integration and orchestration
+
+## Security
+
+For production:
+- Enable basic authentication or OAuth
+- Use HTTPS with reverse proxy
+- Set strong encryption key
+- Use PostgreSQL instead of SQLite
+- Regularly backup workflows and credentials
+
+
+## Related templates
+
+- See other templates in this repository for complementary services
+- Combine with monitoring tools (`prometheus-grafana/`) for observability
+- Integrate with your application stack as needed
+
+## Troubleshooting
+
+- Access n8n UI at `http://localhost:5678`
+- If you changed `n8n-encryption-key` but the container has existing data, credentials may fail to decrypt. Either reset the data volume or keep the same encryption key.
+- Ensure the host volumes are writable by the container user.
+- Generate encryption key:
+
+```bash
+openssl rand -hex 32
+```
+
+- Check workflow execution logs in the n8n UI under "Executions"
+- Check container logs:
+
+```bash
+monk logs -l 500 -f n8n/n8n
+```
+
+- For webhook issues, verify `webhook-url` is correctly set and accessible from external services
+- For credential errors, ensure the encryption key hasn't changed
+- For database issues, verify PostgreSQL connection settings (host, user, password, database)
+- Test node connections in workflow editor before saving workflows
+- If using PostgreSQL, ensure the database is running and accessible before starting n8n
